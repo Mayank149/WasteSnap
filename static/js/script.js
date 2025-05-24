@@ -38,7 +38,7 @@ const tryAgainBtn = document.getElementById('tryAgainBtn');
 const cameraBtn = document.getElementById('cameraBtn');
 const fileInput = document.getElementById('fileInput');
 const cameraModal = document.getElementById('cameraModal');
-const cameraFeed = document.getElementById('cameraFeed');
+const camera = document.getElementById('camera');
 const captureBtn = document.getElementById('captureBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 const quoteText = document.getElementById('quoteText');
@@ -105,14 +105,14 @@ async function startCamera() {
         }
 
         stream = await navigator.mediaDevices.getUserMedia(constraints);
-        cameraFeed.srcObject = stream;
-        await cameraFeed.play();
+        camera.srcObject = stream;
+        await camera.play();
         cameraModal.style.display = 'flex';
 
         // Adjust video element styling
-        cameraFeed.style.width = '100%';
-        cameraFeed.style.height = 'auto';
-        cameraFeed.style.objectFit = 'cover';
+        camera.style.width = '100%';
+        camera.style.height = 'auto';
+        camera.style.objectFit = 'cover';
     } catch (err) {
         console.error('Error accessing camera:', err);
         alert('Error accessing camera. Please make sure you have granted camera permissions.');
@@ -129,9 +129,9 @@ function stopCamera() {
 
 function captureImage() {
     const canvas = document.createElement('canvas');
-    canvas.width = cameraFeed.videoWidth;
-    canvas.height = cameraFeed.videoHeight;
-    canvas.getContext('2d').drawImage(cameraFeed, 0, 0);
+    canvas.width = camera.videoWidth;
+    canvas.height = camera.videoHeight;
+    canvas.getContext('2d').drawImage(camera, 0, 0);
     
     canvas.toBlob(blob => {
         const file = new File([blob], "camera-capture.jpg", { type: "image/jpeg" });
