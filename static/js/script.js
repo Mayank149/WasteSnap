@@ -83,12 +83,38 @@ setInterval(updateQuote, 5000);
 
 async function startCamera() {
     try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // Check if device is mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        const constraints = {
+            video: {
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                aspectRatio: { ideal: 1.777777778 },
+                frameRate: { ideal: 30 }
+            }
+        };
+
+        // Set facingMode based on device type
+        if (isMobile) {
+            constraints.video.facingMode = 'environment'; // Back camera for mobile
+        } else {
+            constraints.video.facingMode = 'user'; // Front camera for desktop/laptop
+            constraints.video.width = { ideal: 640 };
+            constraints.video.height = { ideal: 480 };
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
         cameraFeed.srcObject = stream;
         cameraModal.style.display = 'flex';
+
+        // Adjust video element styling
+        cameraFeed.style.width = '100%';
+        cameraFeed.style.height = 'auto';
+        cameraFeed.style.objectFit = 'cover';
     } catch (err) {
         console.error('Error accessing camera:', err);
-        alert('Could not access camera. Please make sure you have granted camera permissions.');
+        alert('Error accessing camera. Please make sure you have granted camera permissions.');
     }
 }
 
@@ -140,7 +166,9 @@ async function sendImageToServer(file) {
     formData.append('file', file);
 
     try {
-        const response = await fetch('http://localhost:5000/predict', {
+        loadingSpinner.style.display = 'flex';
+        
+        const response = await fetch('/predict', {
             method: 'POST',
             body: formData
         });
