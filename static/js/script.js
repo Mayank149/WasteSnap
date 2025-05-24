@@ -106,6 +106,7 @@ async function startCamera() {
 
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         cameraFeed.srcObject = stream;
+        await cameraFeed.play();
         cameraModal.style.display = 'flex';
 
         // Adjust video element styling
