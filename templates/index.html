@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#22c55e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>WasteSnap - Smart Waste Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="no-select">WasteSnap</h1>
+        
+        <div class="upload-container" id="uploadContainer">
+            <div class="upload-options">
+                <button id="cameraBtn" class="btn no-select">
+                    <span class="icon">📷</span>
+                    Click a Picture
+                </button>
+                <label for="fileInput" class="btn no-select">
+                    <span class="icon">📁</span>
+                    Upload from Device
+                </label>
+                <input type="file" id="fileInput" accept="image/*" capture="environment" hidden>
+            </div>
+        </div>
+
+        <div class="result-container" id="resultContainer" style="display: none;">
+            <img id="previewImage" class="preview-image" alt="Uploaded image">
+            
+            <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="predictionResult" class="prediction-result" style="display: none;">
+                <h2 id="predictionLabel" class="no-select"></h2>
+                <div id="recyclabilityBadge" class="badge no-select"></div>
+                
+                <div class="confidence-meter">
+                    <div class="meter-bar">
+                        <div id="confidenceBar" class="meter-fill"></div>
+                    </div>
+                    <p id="confidenceText" class="no-select"></p>
+                </div>
+
+                <div class="tips-box">
+                    <h3 class="no-select">Disposal Tips</h3>
+                    <p id="disposalTips"></p>
+                </div>
+
+                <button id="tryAgainBtn" class="btn no-select">Try Another Image</button>
+            </div>
+        </div>
+
+        <div id="cameraModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <video id="cameraFeed" autoplay playsinline></video>
+                <div class="camera-controls">
+                    <button id="captureBtn" class="btn no-select">Capture</button>
+                    <button id="cancelBtn" class="btn no-select">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-container">
+            <p id="quoteText" class="quote"></p>
+            <p id="quoteAuthor" class="quote-author"></p>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
