@@ -1,77 +1,56 @@
 # WasteSnap - AI-Powered Waste Classification
 
-WasteSnap is a web application that uses artificial intelligence to classify waste items as recyclable or non-recyclable. The application provides users with smart disposal tips and promotes environmental awareness through an engaging interface.
+WasteSnap is an intelligent waste classification tool that uses AI to identify different types of waste and provide appropriate disposal recommendations. The application features a clean, responsive interface with both light and dark themes, making it accessible and user-friendly.
 
 ## Features
 
-- 📷 Camera integration for instant waste classification
-- 📁 Image upload support
-- 🤖 AI-powered waste classification
-- ♻️ Recyclable/Non-recyclable indicators
-- 💡 Smart disposal tips
-- 🌿 Eco-friendly design
-- 📱 Mobile-responsive interface
+- Real-time waste classification using AI
+- Camera integration for instant waste identification
+- Image upload capability
+- Detailed disposal recommendations
+- Recyclability status
+- Confidence metrics
+- Smart disposal tips
+- Responsive design
+- Light/Dark theme support
+- Mobile-first approach
 
 ## Tech Stack
 
-- Frontend: HTML, CSS, JavaScript (Vanilla)
-- Backend: Flask (Python)
+- Frontend: HTML, CSS, JavaScript
+- Backend: Python Flask
 - AI: TensorFlow
 - Deployment: Render
 
-## Setup Instructions
+## Getting Started
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/wastesnap.git
-cd wastesnap
-```
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run the application:
+   ```bash
+   python app.py
+   ```
+4. Access the application at `http://localhost:5000`
 
-2. Create a virtual environment and activate it:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+## Usage
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+1. Click "Click a Picture" to use your camera
+2. Or click "Upload Image" to select an image file
+3. View the classification results, including:
+   - Waste category
+   - Recyclability status
+   - Confidence level
+   - Disposal tips
 
-4. Run the application locally:
-```bash
-python app.py
-```
+## Created By
 
-The application will be available at `http://localhost:5000`
+Mayank Bansal
 
-## Deployment on Render
-
-1. Create a new Web Service on Render
-2. Connect your GitHub repository
-3. Use the following settings:
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
-   - Python Version: 3.8
-
-## Project Structure
-
-```
-wastesnap/
-├── app.py              # Flask application
-├── requirements.txt    # Python dependencies
-├── wastesnap_model.h5 # Trained model
-├── static/
-│   ├── styles.css     # Styles
-│   └── script.js      # Frontend logic
-└── templates/
-    └── index.html     # Main page
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+A solo project developed with ❤️ for environmental sustainability.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is open source and available under the MIT License. 
