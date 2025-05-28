@@ -1,116 +1,77 @@
-# WasteSnap - Smart Waste Classification
+# WasteSnap - AI-Powered Waste Classification
 
-WasteSnap is an intelligent waste classification application that uses machine learning to identify different types of waste and provide appropriate disposal recommendations. The application helps users make informed decisions about waste management and promotes sustainable practices.
+WasteSnap is a web application that uses artificial intelligence to classify waste items as recyclable or non-recyclable. The application provides users with smart disposal tips and promotes environmental awareness through an engaging interface.
 
 ## Features
 
-- 📸 Real-time waste classification through image upload or camera capture
-- 🔄 Support for multiple waste categories:
-  - Plastic waste
-  - Paper and cardboard waste
-  - Glass waste
-  - Metal waste
-  - Organic waste
-  - Electronic waste
-  - Medicinal waste
-  - Hazardous waste
-  - General waste
-- 📊 Confidence score for predictions
-- 💡 Detailed disposal tips for each waste type
-- 📱 Mobile-responsive design
-- 🌱 Environmental awareness quotes
+- 📷 Camera integration for instant waste classification
+- 📁 Image upload support
+- 🤖 AI-powered waste classification
+- ♻️ Recyclable/Non-recyclable indicators
+- 💡 Smart disposal tips
+- 🌿 Eco-friendly design
+- 📱 Mobile-responsive interface
 
 ## Tech Stack
 
-- **Backend:**
-  - Python
-  - Flask
-  - TensorFlow
-  - Gunicorn
-
-- **Frontend:**
-  - HTML5
-  - CSS3
-  - JavaScript (Vanilla)
-  - Responsive Design
-
-## Project Structure
-
-```
-WasteSnap/
-├── app.py                    # Flask application
-├── requirements.txt          # Python dependencies
-├── gunicorn.conf.py         # Gunicorn configuration
-├── render.yaml              # Render deployment config
-├── wastesnap_model.h5       # ML model
-├── static/
-│   ├── css/
-│   │   └── styles.css       # Styles
-│   └── js/
-│       └── script.js        # Frontend logic
-└── templates/
-    └── index.html           # Main template
-```
+- Frontend: HTML, CSS, JavaScript (Vanilla)
+- Backend: Flask (Python)
+- AI: TensorFlow
+- Deployment: Render
 
 ## Setup Instructions
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/WasteSnap.git
-   cd WasteSnap
-   ```
+```bash
+git clone https://github.com/yourusername/wastesnap.git
+cd wastesnap
+```
 
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+2. Create a virtual environment and activate it:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
 3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-4. Run the application:
-   ```bash
-   python app.py
-   ```
+4. Run the application locally:
+```bash
+python app.py
+```
 
-5. Open your browser and navigate to:
-   ```
-   http://localhost:5000
-   ```
+The application will be available at `http://localhost:5000`
 
-## Deployment
+## Deployment on Render
 
-The application is configured for deployment on Render. The `render.yaml` file contains the necessary configuration for automatic deployment.
+1. Create a new Web Service on Render
+2. Connect your GitHub repository
+3. Use the following settings:
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+   - Python Version: 3.8
 
-## Environment Variables
+## Project Structure
 
-- `FLASK_ENV`: Set to 'production' for deployment
-- `PORT`: Port number (default: 5000)
-- `MODEL_PATH`: Path to the ML model file
+```
+wastesnap/
+├── app.py              # Flask application
+├── requirements.txt    # Python dependencies
+├── wastesnap_model.h5 # Trained model
+├── static/
+│   ├── styles.css     # Styles
+│   └── script.js      # Frontend logic
+└── templates/
+    └── index.html     # Main page
+```
 
 ## Contributing
 
-This is a solo project created by Mayank Bansal. While contributions are welcome, please note that this is primarily a personal project.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Creator
-
-**Mayank Bansal**
-- Developer and Machine Learning Engineer in making
-- Created and maintained as a solo project
-
-## Acknowledgments
-
-- TensorFlow team for the machine learning framework
-- Flask team for the web framework
-- All open-source contributors whose work made this project possible
-
----
-
-Made with ❤️ by Mayank Bansal 
+This project is licensed under the MIT License - see the LICENSE file for details. 

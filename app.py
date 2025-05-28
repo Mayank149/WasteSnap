@@ -1,120 +1,159 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-from tensorflow.keras.models import load_model
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
-from tensorflow.keras.preprocessing.image import img_to_array
+import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
 import os
-import logging
-from werkzeug.utils import secure_filename
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-# Initialize Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
-# Configuration
-MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-MODEL_PATH = os.getenv('MODEL_PATH', 'wastesnap_model.h5')
+# Load the model
+model = tf.keras.models.load_model('wastesnap_model.h5')
 
-# Class labels
-class_labels = ["Plastic_waste",
-    "Paper_and_cardboard_waste",
-    "Glass_waste",
-    "Metal_waste",
-    "Organic_waste",
-    "Electronic_waste",
-    "Medicinal_waste",
-    "Hazardous_waste",
-    "General_waste"]
+# Waste categories
+WASTE_CATEGORIES = [
+    "Plastic waste",
+    "Paper and cardboard waste",
+    "Glass waste",
+    "Metal waste",
+    "Organic waste",
+    "Electronic waste",
+    "Medicinal waste",
+    "Hazardous waste",
+    "General waste"
+]
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# Recyclability status for each category
+RECYCLABILITY_STATUS = {
+    "Plastic waste": "recyclable",
+    "Paper and cardboard waste": "recyclable",
+    "Glass waste": "recyclable",
+    "Metal waste": "recyclable",
+    "Organic waste": "non_recyclable",
+    "Electronic waste": "non_recyclable",
+    "Medicinal waste": "non_recyclable",
+    "Hazardous waste": "non_recyclable",
+    "General waste": "non_recyclable"
+}
 
-# Load the model with error handling
-try:
-    model = load_model(MODEL_PATH)
-    logger.info("Model loaded successfully")
-except Exception as e:
-    logger.error(f"Error loading model: {str(e)}")
-    raise
+# Disposal tips for each waste type
+DISPOSAL_TIPS = {
+    "Plastic waste": [
+        "Clean and dry plastic items before recycling",
+        "Check the recycling number on the item (1-7)",
+        "Remove any non-plastic components",
+        "Flatten containers to save space",
+        "Check local recycling guidelines for specific types"
+    ],
+    "Paper and cardboard waste": [
+        "Remove any plastic or metal components",
+        "Flatten cardboard boxes",
+        "Keep paper dry and clean",
+        "Remove any food residue",
+        "Separate colored and white paper if required"
+    ],
+    "Glass waste": [
+        "Rinse containers thoroughly",
+        "Remove metal caps and lids",
+        "Check for local glass recycling programs",
+        "Handle broken glass with care",
+        "Separate by color if required"
+    ],
+    "Metal waste": [
+        "Clean and dry metal items",
+        "Remove any non-metal components",
+        "Flatten cans to save space",
+        "Check for local metal recycling programs",
+        "Separate different types of metals if possible"
+    ],
+    "Organic waste": [
+        "Compost if possible",
+        "Use a dedicated organic waste bin",
+        "Keep it separate from other waste",
+        "Avoid mixing with non-organic materials",
+        "Consider home composting for food waste"
+    ],
+    "Electronic waste": [
+        "Find local e-waste collection points",
+        "Remove batteries if possible",
+        "Back up and wipe data from devices",
+        "Check for manufacturer take-back programs",
+        "Never dispose in regular waste bins"
+    ],
+    "Medicinal waste": [
+        "Return to pharmacy if possible",
+        "Follow local medication disposal guidelines",
+        "Never flush down the toilet",
+        "Keep in original container",
+        "Check for drug take-back programs"
+    ],
+    "Hazardous waste": [
+        "Find local hazardous waste collection points",
+        "Keep in original containers",
+        "Never mix different types",
+        "Follow safety guidelines",
+        "Contact local waste management for proper disposal"
+    ],
+    "General waste": [
+        "Ensure proper bagging",
+        "Check local waste collection schedules",
+        "Minimize waste where possible",
+        "Consider waste reduction strategies",
+        "Follow local waste management guidelines"
+    ]
+}
+
+def preprocess_image(image_bytes):
+    # Convert bytes to image
+    image = Image.open(io.BytesIO(image_bytes))
+    # Resize to match model input size
+    image = image.resize((224, 224))
+    # Convert to array and normalize
+    image_array = np.array(image) / 255.0
+    # Add batch dimension
+    image_array = np.expand_dims(image_array, axis=0)
+    return image_array
 
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
-
-@app.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({
-        'status': 'healthy',
-        'model_loaded': model is not None,
-        'environment': os.getenv('FLASK_ENV', 'development')
-    })
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'file' not in request.files:
-        logger.error("No file in request")
-        return jsonify({'error': 'No file uploaded'}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        logger.error("Empty filename")
-        return jsonify({'error': 'No file selected'}), 400
-
-    if not allowed_file(file.filename):
-        logger.error(f"Invalid file type: {file.filename}")
-        return jsonify({'error': 'File type not allowed'}), 400
-
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
+    
     try:
-        # Read and process image
-        image = Image.open(io.BytesIO(file.read())).convert('RGB')
-        image = image.resize((224, 224))
-        image = img_to_array(image)
-        image = preprocess_input(image)
-        image = np.expand_dims(image, axis=0)
-
+        # Get image file
+        image_file = request.files['image']
+        image_bytes = image_file.read()
+        
+        # Preprocess image
+        processed_image = preprocess_image(image_bytes)
+        
         # Make prediction
-        preds = model.predict(image)
-        confidence = float(np.max(preds))
-        label = class_labels[np.argmax(preds)]
-
-        logger.info(f"Prediction successful: {label} with confidence {confidence}")
+        predictions = model.predict(processed_image)
+        predicted_category = WASTE_CATEGORIES[np.argmax(predictions[0])]
+        confidence = float(np.max(predictions[0]))
+        
+        # Get recyclability status and tips
+        recyclability = RECYCLABILITY_STATUS[predicted_category]
+        tips = DISPOSAL_TIPS[predicted_category]
         
         return jsonify({
-            'prediction': label,
+            'category': predicted_category,
+            'recyclability': recyclability,
             'confidence': confidence,
-            'all_probabilities': {
-                label: float(prob) for label, prob in zip(class_labels, preds[0])
-            }
+            'tips': tips
         })
-
+        
     except Exception as e:
-        logger.error(f"Prediction error: {str(e)}")
-        return jsonify({'error': 'Error processing image'}), 500
-
-@app.errorhandler(404)
-def not_found(e):
-    return jsonify({'error': 'Resource not found'}), 404
-
-@app.errorhandler(500)
-def server_error(e):
-    return jsonify({'error': 'Internal server error'}), 500
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    debug_mode = os.getenv('FLASK_ENV', 'development') == 'development'
-    port = int(os.getenv('PORT', 5000))
-    app.run(debug=debug_mode, host='0.0.0.0', port=port)
+    # Get port from environment variable or default to 5000
+    port = int(os.environ.get('PORT', 5000))
+    # Run the app on all network interfaces (0.0.0.0) and specified port
+    app.run(host='0.0.0.0', port=port, debug=True) 

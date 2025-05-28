@@ -2,73 +2,98 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#22c55e">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>WasteSnap - Smart Waste Classification</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WasteSnap - AI Waste Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1 class="no-select">WasteSnap</h1>
-        
-        <div class="upload-container" id="uploadContainer">
-            <div class="upload-options">
-                <button id="cameraBtn" class="btn no-select">
-                    <span class="icon">📷</span>
-                    Click a Picture
+        <header>
+            <div class="header-content">
+                <div class="title-section">
+                    <h1>WasteSnap</h1>
+                    <p class="subtitle">AI-Powered Waste Classification</p>
+                </div>
+                <button id="themeToggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark Mode</span>
                 </button>
-                <label for="fileInput" class="btn no-select">
-                    <span class="icon">📁</span>
-                    Upload from Device
-                </label>
-                <input type="file" id="fileInput" accept="image/*" capture="environment" hidden>
             </div>
-        </div>
+        </header>
 
-        <div class="result-container" id="resultContainer" style="display: none;">
-            <img id="previewImage" class="preview-image" alt="Uploaded image">
-            
-            <div id="loadingSpinner" class="loading-spinner" style="display: none;">
-                <div class="spinner"></div>
+        <main>
+            <div class="upload-section">
+                <div class="button-group">
+                    <button id="cameraBtn" class="action-btn">
+                        <i class="fas fa-camera"></i>
+                        Click a Picture
+                    </button>
+                    <button id="uploadBtn" class="action-btn">
+                        <i class="fas fa-upload"></i>
+                        Upload Image
+                    </button>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" hidden>
+                <input type="file" id="cameraInput" accept="image/*" hidden>
             </div>
 
-            <div id="predictionResult" class="prediction-result" style="display: none;">
-                <h2 id="predictionLabel" class="no-select"></h2>
-                <div id="recyclabilityBadge" class="badge no-select"></div>
-                
-                <div class="confidence-meter">
-                    <div class="meter-bar">
-                        <div id="confidenceBar" class="meter-fill"></div>
+            <div id="preview-section" class="preview-section hidden">
+                <button id="backBtn" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Upload
+                </button>
+                <div class="image-preview">
+                    <img id="previewImage" src="" alt="Preview">
+                </div>
+                <div class="results">
+                    <div class="prediction">
+                        <h3>Predicted Waste Type</h3>
+                        <div id="predictionResult" class="prediction-badge"></div>
                     </div>
-                    <p id="confidenceText" class="no-select"></p>
-                </div>
-
-                <div class="tips-box">
-                    <h3 class="no-select">Disposal Tips</h3>
-                    <p id="disposalTips"></p>
-                </div>
-
-                <button id="tryAgainBtn" class="btn no-select">Try Another Image</button>
-            </div>
-        </div>
-
-        <div id="cameraModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <video id="cameraFeed" autoplay playsinline></video>
-                <div class="camera-controls">
-                    <button id="captureBtn" class="btn no-select">Capture</button>
-                    <button id="cancelBtn" class="btn no-select">Cancel</button>
+                    <div class="confidence">
+                        <h3>Confidence</h3>
+                        <div class="progress-container">
+                            <div id="confidenceBar" class="progress-bar"></div>
+                        </div>
+                    </div>
+                    <div class="tips">
+                        <h3>Smart Disposal Tips</h3>
+                        <ul id="tipsList"></ul>
+                    </div>
                 </div>
             </div>
-        </div>
+        </main>
 
-        <div class="quote-container">
-            <p id="quoteText" class="quote"></p>
-            <p id="quoteAuthor" class="quote-author"></p>
+        <div class="quote-carousel">
+            <div class="quote">
+                <i class="fas fa-quote-left"></i>
+                <p id="quoteText">Every small action counts in our journey towards a sustainable future.</p>
+                <i class="fas fa-quote-right"></i>
+            </div>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- Camera Preview Modal -->
+    <div id="cameraModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="camera-container">
+                <video id="cameraPreview" autoplay playsinline></video>
+                <div class="camera-controls">
+                    <button id="captureBtn" class="action-btn">
+                        <i class="fas fa-camera"></i>
+                        Capture
+                    </button>
+                    <button id="closeCameraBtn" class="action-btn secondary">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html> 
