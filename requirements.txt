@@ -1,6 +1,6 @@
 flask
 flask-cors
-tensorflow
+ai-edge-litert
 pillow
 numpy
 gunicorn

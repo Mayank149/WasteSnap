@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
@@ -9,8 +8,22 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Load the model
-model = tf.keras.models.load_model('wastesnap_model.h5')
+# Load lightweight LiteRT / TFLite interpreter (optimized for low-memory cloud deployments)
+try:
+    from ai_edge_litert.interpreter import Interpreter
+except ImportError:
+    try:
+        from tflite_runtime.interpreter import Interpreter
+    except ImportError:
+        import tensorflow as tf
+        Interpreter = tf.lite.Interpreter
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'wastesnap_model.tflite')
+interpreter = Interpreter(model_path=MODEL_PATH)
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # Waste categories
 WASTE_CATEGORIES = [
@@ -106,12 +119,12 @@ DISPOSAL_TIPS = {
 }
 
 def preprocess_image(image_bytes):
-    # Convert bytes to image
-    image = Image.open(io.BytesIO(image_bytes))
-    # Resize to match model input size
+    # Convert bytes to image in RGB mode
+    image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+    # Resize to match model input size (224x224)
     image = image.resize((224, 224))
     # Convert to array and normalize
-    image_array = np.array(image) / 255.0
+    image_array = np.array(image, dtype=np.float32) / 255.0
     # Add batch dimension
     image_array = np.expand_dims(image_array, axis=0)
     return image_array
@@ -133,8 +146,11 @@ def predict():
         # Preprocess image
         processed_image = preprocess_image(image_bytes)
         
-        # Make prediction
-        predictions = model.predict(processed_image)
+        # Run inference using TFLite / LiteRT interpreter
+        interpreter.set_tensor(input_details[0]['index'], processed_image)
+        interpreter.invoke()
+        predictions = interpreter.get_tensor(output_details[0]['index'])
+        
         predicted_category = WASTE_CATEGORIES[np.argmax(predictions[0])]
         confidence = float(np.max(predictions[0]))
         
@@ -156,4 +172,4 @@ if __name__ == '__main__':
     # Get port from environment variable or default to 5000
     port = int(os.environ.get('PORT', 5000))
     # Run the app on all network interfaces (0.0.0.0) and specified port
-    app.run(host='0.0.0.0', port=port, debug=True) 
+    app.run(host='0.0.0.0', port=port, debug=True)
